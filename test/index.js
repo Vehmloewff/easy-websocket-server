@@ -12,7 +12,7 @@ socket.onServerUpgrade((next, quit, req) => {
 })
 
 socket.use((id, message, next) => {
-	message.method = 'data';
+	if (!message.method) message.method = 'data';
 	next();
 })
 
@@ -25,12 +25,20 @@ socket.onConnection(id => {
 	console.log(`Connection: ${id}`);
 	broadcastAll('new', 'hi');
 })
+
 socket.onMessage(`default`, (id, message) => {
 	console.log(`New message from: ${id}`, message);
 	send(id, "res", 'Thanks!');
 	broadcastExclude(id, 'res', 'Hi, everyone!');
 	console.log(getConnections());
+
+	throw new Error('Unknown error!')
 })
+
 socket.useRemote(`data`, dataRoutes);
+
+socket.catchErrors(err => {
+	console.log('Something went wrong:', err.message)
+})
 
 server.listen(3000);

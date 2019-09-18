@@ -30,6 +30,7 @@ module.exports = (server) => {
 	let callOnConnection = [];
 	let callOnMessage = [];
 	let callOnClose = [];
+	let errorHandler = null;
 	sockets.on('connection', function(socket, req) {
 		const id = `socketId${Date.now()}`;
 
@@ -51,7 +52,15 @@ module.exports = (server) => {
 
 			function call() {
 				const fn = callOnMessage[index];
-				if (fn) fn(socket.id, message, next);
+				if (fn) {
+					if (errorHandler) {
+						try {
+							fn(socket.id, message, next);
+						} catch (error) {
+							errorHandler(error, socket.id, message);
+						}
+					} else fn(socket.id, message, next);
+				}
 			}
 
 			function next() {
@@ -128,13 +137,28 @@ module.exports = (server) => {
 		})
 	}
 
+	/**
+	 * Catches all errors in the message processing pipeline
+	 * @param {Function} cb Error handler
+	 * @example
+	 * socket.catchErrors((error, id, message) => {
+	 *     console.error('Something went wrong.', error);
+	 *     commands.broadcastAll('error', 'Internal server error');
+	 *     commands.close();
+	 * })
+	 */
+	function catchErrors(cb) {
+		errorHandler = cb;
+	}
+
 	return {
 		use,
 		onServerUpgrade,
 		useRemote,
 		onConnection,
 		onMessage,
-		onClose
+		onClose,
+		catchErrors,
 	}
 }
 
@@ -203,7 +227,6 @@ function getConnections() {
 
 	Object.values(connections).forEach(connection => {
 		const { id, incommingMessages, outgoingMessages, ip } = connection;
-		console.log(address);
 		toReturn[id] = { id, incommingMessages, outgoingMessages, ip };
 	})
 

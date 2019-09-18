@@ -12,7 +12,7 @@ socket.onServerUpgrade((next, quit, req) => {
 })
 
 socket.use((id, message, next) => {
-	console.log(`In middleware 1...`);
+	message.method = 'data';
 	next();
 })
 

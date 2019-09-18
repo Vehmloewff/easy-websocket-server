@@ -50,7 +50,8 @@ module.exports = (server) => {
 			let index = -1;
 
 			function call() {
-				callOnMessage[index](socket.id, message, next);
+				const fn = callOnMessage[index];
+				if (fn) fn(socket.id, message, next);
 			}
 
 			function next() {

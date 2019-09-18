@@ -1,7 +1,7 @@
 {
-	"name": "socket",
-	"version": "1.0.0",
-	"description": "",
+	"name": "easy-websocket-server",
+	"version": "1.0.0-beta.1.0",
+	"description": "An easy-to-use wrapper around the ws api for an express-like feel",
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
@@ -15,5 +15,9 @@
 	},
 	"dependencies": {
 		"ws": "^7.1.2"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Vehmloewff/easy-websocket-server"
 	}
 }

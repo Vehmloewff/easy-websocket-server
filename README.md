@@ -255,3 +255,6 @@ The `callback` will be called when a message is recieved with a method that matc
 
 Many thanks to [@websockets/ws](https://github.com/websockets/ws), the backbone of this package.
 
+## License
+
+[MIT](/LICENSE)

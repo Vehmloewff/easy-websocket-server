@@ -11,32 +11,20 @@ module.exports = (server) => {
 
 	sockets = new WebSocket.Server({ noServer: true });
 
-	let callOnUpgrade = [];
+	let callOnUpgrade = null;
 	server.on('upgrade', async function upgrade(request, socket, head) {
 
-		let currentIndex = null;
-
 		const next = () => {
-			if (currentIndex === null) currentIndex = 0;
-			else currentIndex++;
-
-			if (callOnUpgrade[currentIndex]) call(currentIndex);
-			else {
-				sockets.handleUpgrade(request, socket, head, (ws) => {
+			sockets.handleUpgrade(request, socket, head, (ws) => {
 					sockets.emit('connection', ws, request);
-				});
-			}
+			});
 		}
 
-		function quit() {
+		const quit = () => {
 			socket.destroy();
 		}
 		
-		function call(index) {
-			callOnUpgrade[index](next, quit, request, socket, head);
-		}
-
-		next();
+		if (callOnUpgrade) callOnUpgrade(next, quit, request, socket, head);
 	});
 	
 	let callOnConnection = [];
@@ -59,7 +47,18 @@ module.exports = (server) => {
 
 			socket.incommingMessages.push(message);
 
-			callOnMessage.forEach(fn => fn(socket.id, message));
+			let index = -1;
+
+			function call() {
+				callOnMessage[index](socket.id, message, next);
+			}
+
+			function next() {
+				index++;
+				call();
+			}
+
+			next();
 		})
 
 		socket.on(`close`, code => {
@@ -71,13 +70,24 @@ module.exports = (server) => {
 	/**
 	 * @param {Function} cb Custom middleware
 	 * @example
-	 * socket.use((next, quit, request, socket, head) => {
+	 * socket.use((id, message, next) => {
+	 *     // ...
+	 * })
+	 */
+	function use(cb) {
+		callOnMessage.push(cb);
+	}
+
+	/**
+	 * @param {Function} cb Called when the server upgrades a request to websocket
+	 * @example
+	 * socket.onServerUpgrade((next, quit, request, socket, head) => {
 	 *     if (someCondition) next();
 	 *     else quit();
 	 * })
 	 */
-	function use(cb) {
-		callOnUpgrade.push(cb);
+	function onServerUpgrade(cb) {
+		callOnUpgrade = cb;
 	}
 
 	/**
@@ -92,8 +102,9 @@ module.exports = (server) => {
 	 * @param {Function} cb Called everytime a message is received with the correct method.
 	 */
 	function onMessage(method, cb) {
-		callOnMessage.push((id, message) => {
+		callOnMessage.push((id, message, next) => {
 			if (message.method == method) cb(id, message.data);
+			else next();
 		})
 	}
 
@@ -118,6 +129,7 @@ module.exports = (server) => {
 
 	return {
 		use,
+		onServerUpgrade,
 		useRemote,
 		onConnection,
 		onMessage,

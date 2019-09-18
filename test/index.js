@@ -4,23 +4,33 @@ const { broadcastExclude, broadcastAll, send, getConnections } = require('../').
 const dataRoutes = require('./data');
 
 const server = http.createServer();
-const app = easySocket(server);
+const socket = easySocket(server);
 
-app.use((next, quit, req) => {
-	console.log()
+socket.onServerUpgrade((next, quit, req) => {
+	console.log('Upgrading...');
 	next();
 })
 
-app.onConnection(id => {
+socket.use((id, message, next) => {
+	console.log(`In middleware 1...`);
+	next();
+})
+
+socket.use((id, message, next) => {
+	console.log(`In middleware 2...`);
+	next();
+})
+
+socket.onConnection(id => {
 	console.log(`Connection: ${id}`);
 	broadcastAll('new', 'hi');
 })
-app.onMessage(`default`, (id, message) => {
+socket.onMessage(`default`, (id, message) => {
 	console.log(`New message from: ${id}`, message);
 	send(id, "res", 'Thanks!');
 	broadcastExclude(id, 'res', 'Hi, everyone!');
 	console.log(getConnections());
 })
-app.useRemote(`data`, dataRoutes);
+socket.useRemote(`data`, dataRoutes);
 
 server.listen(3000);

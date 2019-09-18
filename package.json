@@ -4,8 +4,7 @@
 	"description": "An easy-to-use wrapper around the ws api for an express-like feel",
 	"main": "index.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"dev": "nodemon test"
+		"test": "nodemon test"
 	},
 	"keywords": [],
 	"author": "Vehmloewff",

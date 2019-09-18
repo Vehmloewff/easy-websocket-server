@@ -1,0 +1,19 @@
+{
+	"name": "socket",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"dev": "nodemon test"
+	},
+	"keywords": [],
+	"author": "Vehmloewff",
+	"license": "MIT",
+	"devDependencies": {
+		"nodemon": "^1.19.2"
+	},
+	"dependencies": {
+		"ws": "^7.1.2"
+	}
+}

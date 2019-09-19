@@ -1,6 +1,6 @@
 {
 	"name": "easy-websocket-server",
-	"version": "1.0.0-beta.1.0",
+	"version": "1.0.0",
 	"description": "An easy-to-use wrapper around the ws api for an express-like feel",
 	"main": "index.js",
 	"scripts": {

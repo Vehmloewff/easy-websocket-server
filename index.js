@@ -188,6 +188,7 @@ function send(id, method, data) {
 	validate.id(id);
 	validate.method(method);
 	validate.messageData(data);
+	thowErrorIfNoConnection();
 
 	const newMessage = {
 		method,
@@ -204,6 +205,7 @@ function send(id, method, data) {
 function broadcastAll(method, data) {
 	validate.method(method);
 	validate.messageData(data);
+	thowErrorIfNoConnection();
 
 	Object.keys(connections).forEach(id => send(id, method, data));
 }
@@ -217,6 +219,7 @@ function broadcastExclude(id, method, data) {
 	validate.id(id);
 	validate.method(method);
 	validate.messageData(data);
+	thowErrorIfNoConnection();
 
 	Object.keys(connections).forEach(keyId => {
 		if (keyId !== id) send(keyId, method, data);
@@ -224,7 +227,7 @@ function broadcastExclude(id, method, data) {
 }
 
 /**
- * @param {String} id The id of the connection to close.  If omitted, all connections will be closed.
+ * @param {String?} id The id of the connection to close.  If omitted, all connections will be closed.
  * @returns {Promise<boolean>}
  * @example
  * (async function() {
@@ -235,8 +238,9 @@ function broadcastExclude(id, method, data) {
  *     await socket.close()
  * })
  */
-function close(id = null) {
-	if (id !== null) validate.id(id);
+function close(id) {
+	if (id !== undefined) validate.id(id);
+	thowErrorIfNoConnection(id);
 
 	return new Promise((resolve, reject) => {
 		if (!id) connections.forEach(connection => connection.close());
@@ -293,3 +297,30 @@ module.exports.remoteEngine = () => {
 		onMessage,
 	}
 }
+
+/**
+ * @param {String?} id The id of the connection to check.  If no id is given, easySocket will check for at least one connection.
+ * @returns {Boolean}
+ */
+function hasConnected(id) {
+	if (id !== undefined) {
+		validate.id(id);
+
+		return !!connections[id];
+	} else return !!Object.keys(connections)[0];
+}
+
+/**
+ * @param {String?} id The id of the connection to check.  If no id is given, easySocket will check for at least one connection.
+ * @summary Throws an error if connection does not exist.
+ */
+function thowErrorIfNoConnection(id) {
+	console.log(id)
+	if (!hasConnected(id)) {
+		console.log(id)
+		if (!id) throw new Error(`There are no connections.`);
+		else throw new Error(`There is no connection to a client with id "${id}".`);
+	}
+}
+
+module.exports.socketHasConnected = hasConnected;

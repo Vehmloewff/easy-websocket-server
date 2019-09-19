@@ -128,6 +128,7 @@ const easySocket = require('easy-socket-server');
     - [`getConnections`]()
 - [`easySocket.remoteEngine`]()
     - [`onMessage`]()
+- [`easySocket.hasConnected`]()
 
 ### easySocket(server)
 
@@ -250,6 +251,10 @@ See this [example]().
 #### remote.onMessage(callback: (id, message) => void)
 
 The `callback` will be called when a message is recieved with a method that matches the `method` paramater in the `socket.useRemote` function.
+
+### easySocket.hasConnected(id?): Boolean
+
+The `id` is the id of the connection to check.  If no id is given, easySocket will check for at least one connection.
 
 ## Thanks
 

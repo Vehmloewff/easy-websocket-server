@@ -1,6 +1,7 @@
 const easySocket = require('../');
 const http = require('http');
 const { broadcastExclude, broadcastAll, send, getConnections, close } = require('../').commands;
+const { hasConnected: socketHasConnected } = require('../');
 const dataRoutes = require('./data');
 
 const server = http.createServer();
@@ -24,6 +25,9 @@ socket.use((id, message, next) => {
 socket.onConnection(id => {
 	console.log(`Connection: ${id}`);
 	broadcastAll('new', 'hi');
+
+	console.log(socketHasConnected());
+	console.log(socketHasConnected(id));
 })
 
 socket.onMessage(`default`, (id, message) => {

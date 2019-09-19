@@ -78,6 +78,8 @@ remote.onMessage(id => {
 module.exports = remote;
 ```
 
+There is a more thorough example in the `/test` directory.
+
 ## Sending messages from the client
 
 All must messages from the client are recomended to have this format:

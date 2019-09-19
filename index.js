@@ -1,4 +1,5 @@
 const WebSocket = require('ws');
+const validate = require('./validate');
 
 let connections = {};
 
@@ -85,6 +86,8 @@ module.exports = (server) => {
 	 * })
 	 */
 	function use(cb) {
+		validate.cb(cb);
+
 		callOnMessage.push(cb);
 	}
 
@@ -97,6 +100,8 @@ module.exports = (server) => {
 	 * })
 	 */
 	function onServerUpgrade(cb) {
+		validate.cb(cb);
+
 		callOnUpgrade = cb;
 	}
 
@@ -104,6 +109,8 @@ module.exports = (server) => {
 	 * @param {Function} cb Called everytime a new connection is recieved
 	 */
 	function onConnection(cb) {
+		validate.cb(cb);
+
 		callOnConnection.push(cb);
 	}
 
@@ -112,6 +119,9 @@ module.exports = (server) => {
 	 * @param {Function} cb Called everytime a message is received with the correct method.
 	 */
 	function onMessage(method, cb) {
+		validate.method(method);
+		validate.cb(cb);
+
 		callOnMessage.push((id, message, next) => {
 			if (message.method == method) cb(id, message.data);
 			else next();
@@ -122,6 +132,8 @@ module.exports = (server) => {
 	 * @param {Function} cb Called when a socket closes
 	 */
 	function onClose(cb) {
+		validate.cb(cb);
+
 		callOnClose.push(cb);
 	}
 
@@ -130,6 +142,9 @@ module.exports = (server) => {
 	 * @param {Remote} remote
 	 */
 	function useRemote(method, remote) {
+		validate.method(method);
+		validate.remote(remote);
+
 		remote.calls.forEach(call => {
 			if (call.name === `onMessage`) call.params.unshift(method);
 
@@ -148,6 +163,8 @@ module.exports = (server) => {
 	 * })
 	 */
 	function catchErrors(cb) {
+		validate.cb(cb);
+
 		errorHandler = cb;
 	}
 
@@ -168,6 +185,10 @@ module.exports = (server) => {
  * @param {(Object|String|Array)} data What to send to the client
  */
 function send(id, method, data) {
+	validate.id(id);
+	validate.method(method);
+	validate.messageData(data);
+
 	const newMessage = {
 		method,
 		data,
@@ -181,6 +202,9 @@ function send(id, method, data) {
  * @param {(Object|String|Array)} data What to send
  */
 function broadcastAll(method, data) {
+	validate.method(method);
+	validate.messageData(data);
+
 	Object.keys(connections).forEach(id => send(id, method, data));
 }
 
@@ -190,6 +214,10 @@ function broadcastAll(method, data) {
  * @param {(Object|String|Array)} data What to send
  */
 function broadcastExclude(id, method, data) {
+	validate.id(id);
+	validate.method(method);
+	validate.messageData(data);
+
 	Object.keys(connections).forEach(keyId => {
 		if (keyId !== id) send(keyId, method, data);
 	})
@@ -208,6 +236,8 @@ function broadcastExclude(id, method, data) {
  * })
  */
 function close(id = null) {
+	if (id !== null) validate.id(id);
+
 	return new Promise((resolve, reject) => {
 		if (!id) connections.forEach(connection => connection.close());
 		else if (!connections[id]) reject(new Error("Invalid id"));
@@ -252,6 +282,8 @@ module.exports.remoteEngine = () => {
 	 * })
 	 */
 	function onMessage(cb) {
+		validate.cb(cb);
+
 		calls.push({ name: 'onMessage', params: [cb] });
 		return { calls };
 	};

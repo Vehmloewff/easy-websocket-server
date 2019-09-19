@@ -1,6 +1,6 @@
 const easySocket = require('../');
 const http = require('http');
-const { broadcastExclude, broadcastAll, send, getConnections } = require('../').commands;
+const { broadcastExclude, broadcastAll, send, getConnections, close } = require('../').commands;
 const dataRoutes = require('./data');
 
 const server = http.createServer();

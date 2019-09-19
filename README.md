@@ -113,22 +113,22 @@ const easySocket = require('easy-socket-server');
 ```
 
 - [`easySocket`](#easysocketserver)
-    - [`onServerUpgrade`]()
-    - [`onConnection`]()
-    - [`use`]()
-    - [`onMessage`]()
-    - [`onClose`]()
-    - [`useRemote`]()
-    - [`catchErrors`]()
-- [`easySocket.commands`]()
-    - [`send`]()
-    - [`broadcastAll`]()
-    - [`broadcastExclude`]()
-    - [`close`]()
-    - [`getConnections`]()
-- [`easySocket.remoteEngine`]()
-    - [`onMessage`]()
-- [`easySocket.hasConnected`]()
+    - [`onServerUpgrade`](#socketonserverupgradecallback-next-quit-request-socket-head--void)
+    - [`onConnection`](#socketonconnectioncallback-id--void)
+    - [`use`](#socketusecallback-id-message-next--void)
+    - [`onMessage`](#socketonmessagemethod-string-callback-id-message--void)
+    - [`onClose`](#socketonclosecallback-id-code--void)
+    - [`useRemote`](#socketuseremotemethod-string-remote-remoteengine)
+    - [`catchErrors`](#socketcatcherrorscallback-error-id-message--void)
+- [`easySocket.commands`](#easysocketcommands)
+    - [`send`](#commandssendid-method-data)
+    - [`broadcastAll`](#commandsbroadcastallmethod-data)
+    - [`broadcastExclude`](#commandsbroadcastexclude)
+    - [`close`](#commandscloseid)
+    - [`getConnections`](#commandsgetconnections-object)
+- [`easySocket.remoteEngine`](#easysocketremoteengine)
+    - [`onMessage`](#remoteonmessagecallback-id-message--void)
+- [`easySocket.hasConnected`](#easysockethasconnectedid-boolean)
 
 ### easySocket(server)
 
@@ -155,7 +155,7 @@ socket.onServerUpgrade((next, quit, request, socket, head) => {
 
 #### socket.onConnection(callback: id => void)
 
-The `callback` is called everytime a new websocket connection is recieved.  If `quit` or `next` are not called in [`socket.onServerUpgrade`](), then this will happen right after `onServerUpgrade`.
+The `callback` is called everytime a new websocket connection is recieved.  If `quit` or `next` are not called in [`socket.onServerUpgrade`](#socketonserverupgradecallback-next-quit-request-socket-head--void), then this will happen right after `onServerUpgrade`.
 
 The `id` is the random id assigned to the client.
 
@@ -177,7 +177,7 @@ The `remote` is the remoteEngine to use for the given `method`.
 
 Now easySocket will call the `onMessage` method on the remote when the message's method property equals `method`.
 
-Here is an [example]().
+Here is an [example](#remotes).
 
 #### socket.catchErrors(callback: (error, id, message) => void)
 
@@ -199,13 +199,13 @@ The `data` is what is to me sent in the message.
 
 #### commands.broadcastAll(method, data)
 
-Same as [`commands.send`](), except that it broadcasts a message to all the clients.
+Same as [`commands.send`](#commandssendid-method-data), except that it broadcasts a message to all the clients.
 
 #### commands.broadcastExclude()]
 
 The `id` is the id of the client to exclude.
 
-Otherwise, id is the same as [`commands.broadcastAll`]().
+Otherwise, id is the same as [`commands.broadcastAll`](#commandsbroadcastallmethod-data).
 
 #### commands.close(id?)
 
@@ -246,7 +246,7 @@ const remote = require('easy-websocket-server').remoteEngine();
 module.exports = remote;
 ```
 
-See this [example]().
+See this [example](#remotes).
 
 #### remote.onMessage(callback: (id, message) => void)
 

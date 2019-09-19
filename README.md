@@ -254,6 +254,8 @@ The `callback` will be called when a message is recieved with a method that matc
 
 ### easySocket.hasConnected(id?): Boolean
 
+Checks if a connection exists.
+
 The `id` is the id of the connection to check.  If no id is given, easySocket will check for at least one connection.
 
 ## Thanks

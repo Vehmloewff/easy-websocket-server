@@ -4,7 +4,8 @@
 	"description": "An easy-to-use wrapper around the ws api for an express-like feel",
 	"main": "index.js",
 	"scripts": {
-		"test": "nodemon test"
+		"test": "nodemon test",
+		"postversion": "git push && git push --tags && rm -rf build/temp"
 	},
 	"keywords": [],
 	"author": "Vehmloewff",

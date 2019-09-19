@@ -2,7 +2,7 @@ const easySocket = require('../');
 const http = require('http');
 const { broadcastExclude, broadcastAll, send, getConnections, close } = require('../').commands;
 const { hasConnected: socketHasConnected } = require('../');
-const dataRoutes = require('./data');
+const dataRemote = require('./data');
 
 const server = http.createServer();
 const socket = easySocket(server);
@@ -39,7 +39,7 @@ socket.onMessage(`default`, (id, message) => {
 	throw new Error('Unknown error!')
 })
 
-socket.useRemote(`data`, dataRoutes);
+socket.useRemote(`data`, dataRemote);
 
 socket.catchErrors(err => {
 	console.log('Something went wrong:', err.message)
